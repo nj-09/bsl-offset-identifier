@@ -9,6 +9,11 @@
 git clone <repository-url>
 cd BadOffsetIdentifier
 pip3 install -r requirements.txt
+
+# Install ffmpeg (required for frame extraction)
+# macOS: brew install ffmpeg
+# Ubuntu/Debian: sudo apt-get install ffmpeg
+# Windows: Download from https://ffmpeg.org/download.html
 ```
 
 ### Configuration
@@ -24,10 +29,30 @@ BadOffsetIdentifier/CAVA_Data/EAFs/
 BadOffsetIdentifier/CAVA_Data/Videos/
 ```
 
+### Test Setup (Optional)
+```bash
+python3 test_cava.py  # Check dependencies and data structure
+```
+
 ### Run
 ```bash
 python3 run_bot.py
 ```
+
+## 🧪 Testing with CAVA Sample Files
+
+To test with publicly available BSL Corpus files:
+
+1. **Visit CAVA Repository**: https://bslcorpusproject.org/cava/
+2. **Download Sample Files**: Look for narrative task files (open access)
+3. **Set up data structure**:
+   ```bash
+   mkdir -p CAVA_Data/EAFs CAVA_Data/Videos
+   # Move downloaded .eaf files to CAVA_Data/EAFs/
+   # Move downloaded .mp4 files to CAVA_Data/Videos/
+   ```
+4. **Run test**: `python3 test_cava.py`
+5. **Start analysis**: `python3 run_bot.py`
 
 **That's it!** The system will:
 1. ✅ Generate HTML assessment interface
@@ -43,6 +68,7 @@ BadOffsetIdentifier/
 ├── simple_viewer.py             # Core assessment logic
 ├── collect_decisions.py         # Merge downloaded decisions
 ├── save_decision.py             # Manual CSV save script (backup)
+├── test_cava.py                 # Test setup and dependencies
 ├── requirements.txt             # Python dependencies
 ├── offset_assessment.html       # Generated HTML (reloadable)
 ├── decisions.csv               # Your decision tracking

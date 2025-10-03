@@ -1,1 +1,6 @@
 pympi-ling>=1.70
+
+# Note: ffmpeg is also required but must be installed separately:
+# - macOS: brew install ffmpeg
+# - Ubuntu/Debian: sudo apt-get install ffmpeg
+# - Windows: Download from https://ffmpeg.org/download.html
