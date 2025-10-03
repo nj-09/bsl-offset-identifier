@@ -35,7 +35,7 @@ class SimpleSignAnnotate:
     def find_conversation_files(self):
         """Find EAF files with minimum 20 total annotations and GOOD annotations"""
         suitable_files = []
-        print("🔍 Scanning files for annotation requirements...")
+        print("Scanning files for annotation requirements...")
 
         for root, dirs, files in os.walk(self.eaf_folder):
             for file in files:
@@ -55,7 +55,7 @@ class SimpleSignAnnotate:
                                                if value and value.strip().upper() == "GOOD")
                                 if good_count >= 5:
                                     suitable_files.append(file_path)
-                                    print(f"  ✅ {file}: {total_annotations} total, {good_count} GOOD")
+                                    print(f"  Found {file}: {total_annotations} total, {good_count} GOOD")
                         except:
                             continue
 
@@ -80,7 +80,7 @@ class SimpleSignAnnotate:
                     offset = int(descriptor["TIME_ORIGIN"])
                     break
         except (AttributeError, KeyError, ValueError) as e:
-            print(f"   ⚠️  Warning: Could not get video offset for {video_filename}: {e}")
+            print(f"   WARNING: Could not get video offset for {video_filename}: {e}")
             offset = 0
         return offset
 
@@ -127,7 +127,7 @@ class SimpleSignAnnotate:
                     video_path = os.path.join(self.video_folder, base_name + ext)
                     if os.path.exists(video_path):
                         found_videos.append(video_path)
-                        print(f"   📹 Found video: {os.path.basename(video_path)}")
+                        print(f"   Video: Found video: {os.path.basename(video_path)}")
                         break
                 else:
                     # If exact match not found, try partial matching
@@ -137,7 +137,7 @@ class SimpleSignAnnotate:
                     for match in matches:
                         if match not in found_videos:
                             found_videos.append(match)
-                            print(f"   📹 Found video (partial match): {os.path.basename(match)}")
+                            print(f"   Video: Found video (partial match): {os.path.basename(match)}")
                             break
 
         # If still no videos found, try basic filename matching
@@ -165,14 +165,14 @@ class SimpleSignAnnotate:
         unprocessed_files = [f for f in all_files if os.path.basename(f) not in processed_files]
 
         if not unprocessed_files:
-            print("🎉 All files have been processed!")
+            print("COMPLETE: All files have been processed!")
             return
 
         file_path = unprocessed_files[0]
         filename = os.path.basename(file_path)
 
-        print(f"🔄 Processing: {filename}")
-        print(f"📊 Remaining files: {len(unprocessed_files)}")
+        print(f"Processing: Processing: {filename}")
+        print(f"Remaining: Remaining files: {len(unprocessed_files)}")
 
         temp_dir = tempfile.mkdtemp()
 
@@ -213,7 +213,7 @@ class SimpleSignAnnotate:
             with open(self.output_file, 'w', encoding='utf-8') as f:
                 f.write(html_content)
 
-            print(f"✅ HTML generated: {self.output_file}")
+            print(f"Generated: HTML generated: {self.output_file}")
             os.system(f'open "{self.output_file}"')
 
         finally:
@@ -233,9 +233,9 @@ class SimpleSignAnnotate:
 
         # Debug output for offset information
         if video_offset_ms > 0:
-            print(f"   📐 Video {video_num} offset: {video_offset_ms}ms for {video_filename}")
+            print(f"   Offset: Video {video_num} offset: {video_offset_ms}ms for {video_filename}")
         else:
-            print(f"   ⚠️  Video {video_num} no offset found for {video_filename}")
+            print(f"   WARNING:  Video {video_num} no offset found for {video_filename}")
 
         # Extract frame at midpoint (47.5% - perfect middle between 45-50%)
         percentage = 0.475
@@ -481,7 +481,7 @@ class SimpleSignAnnotate:
         </div>
 
         <div class="progress-info">
-            <h3>📊 File Status</h3>
+            <h3>Remaining: File Status</h3>
             <p><strong>Current file:</strong> {filename}</p>
             <p><strong>Remaining files:</strong> {remaining_count}</p>
             <p><strong>Total frames:</strong> {len(all_frames)} (4 time points × annotations × videos)</p>
@@ -489,7 +489,7 @@ class SimpleSignAnnotate:
         </div>
 
         <div class="file-header">
-            <h3>📊 All "GOOD" Annotations in File</h3>
+            <h3>Remaining: All "GOOD" Annotations in File</h3>
             <p>Scroll down to review all annotations, then make one decision for the entire file</p>
         </div>
 
@@ -499,7 +499,7 @@ class SimpleSignAnnotate:
 
         <div class="assessment-buttons">
             <button class="btn btn-good" onclick="recordDecision('accept')">
-                ✅ Accept<br><small>Good offset alignment</small>
+                Generated: Accept<br><small>Good offset alignment</small>
             </button>
             <button class="btn btn-bad" onclick="recordDecision('reject')">
                 ❌ Reject<br><small>Poor offset alignment</small>
@@ -543,7 +543,7 @@ class SimpleSignAnnotate:
                     const frame1 = annotationFrames['Video 1'];
                     html += `
                         <div class="video-column">
-                            <div class="video-header">📹 Video 1</div>
+                            <div class="video-header">Video: Video 1</div>
                             <div class="frame-card">
                                 <img src="data:image/png;base64,${{frame1.data}}" class="frame-img" alt="Video 1">
                                 <div class="frame-info">Time: ${{frame1.time}}s</div>
@@ -557,7 +557,7 @@ class SimpleSignAnnotate:
                     const frame2 = annotationFrames['Video 2'];
                     html += `
                         <div class="video-column">
-                            <div class="video-header">📹 Video 2</div>
+                            <div class="video-header">Video: Video 2</div>
                             <div class="frame-card">
                                 <img src="data:image/png;base64,${{frame2.data}}" class="frame-img" alt="Video 2">
                                 <div class="frame-info">Time: ${{frame2.time}}s</div>
@@ -597,13 +597,13 @@ class SimpleSignAnnotate:
                 }})
             }}).then(response => {{
                 if (response.ok) {{
-                    console.log('✅ Main CSV updated successfully');
+                    console.log('Generated: Main CSV updated successfully');
                 }} else {{
-                    console.log('⚠️ Server update failed (response not ok), backup download still works');
+                    console.log('WARNING: Server update failed (response not ok), backup download still works');
                     console.log('Status:', response.status, response.statusText);
                 }}
             }}).catch(error => {{
-                console.log('⚠️ Server not available, backup download still works');
+                console.log('WARNING: Server not available, backup download still works');
                 console.log('Error:', error.message);
             }});
 
@@ -621,17 +621,17 @@ class SimpleSignAnnotate:
             document.body.removeChild(a);
 
             if (decision === 'accept') {{
-                resultDiv.innerHTML = `✅ <span style="color: #27ae60;"><strong>Decision: ACCEPT for entire file</strong><br>
-                    ✅ Main CSV updated immediately!<br>
-                    ✅ Backup file downloaded to Downloads folder!<br>
+                resultDiv.innerHTML = `Generated: <span style="color: #27ae60;"><strong>Decision: ACCEPT for entire file</strong><br>
+                    Generated: Main CSV updated immediately!<br>
+                    Generated: Backup file downloaded to Downloads folder!<br>
                     📁 File: decision_accept_{filename}.csv<br>
-                    🔄 Refreshing page for next file in 3 seconds...</span>`;
+                    Processing: Refreshing page for next file in 3 seconds...</span>`;
             }} else {{
                 resultDiv.innerHTML = `❌ <span style="color: #e74c3c;"><strong>Decision: REJECT for entire file</strong><br>
-                    ✅ Main CSV updated immediately!<br>
-                    ✅ Backup file downloaded to Downloads folder!<br>
+                    Generated: Main CSV updated immediately!<br>
+                    Generated: Backup file downloaded to Downloads folder!<br>
                     📁 File: decision_reject_{filename}.csv<br>
-                    🔄 Refreshing page for next file in 3 seconds...</span>`;
+                    Processing: Refreshing page for next file in 3 seconds...</span>`;
             }}
 
             // Disable buttons

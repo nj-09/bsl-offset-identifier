@@ -1,185 +1,153 @@
-# 🎯 Bad Offset Identifier Tool
+# Bad Offset Identifier Tool
 
-> **Reliable, standalone system for identifying BSL video files with bad offset alignment**
+A Python-based tool for identifying BSL video files with poor offset alignment in the British Sign Language Corpus. This tool processes EAF annotation files and corresponding video files to detect synchronization issues between multiple camera angles.
 
-## 🚀 Quick Start
+## Overview
 
-### Installation
+The tool extracts frames from video files at the midpoint of "GOOD" sign annotations and displays them side-by-side for visual inspection. Users can quickly identify files where video timing does not match annotation timing, indicating offset alignment problems.
+
+## Installation
+
+### Prerequisites
+
+- Python 3.7 or higher
+- FFmpeg (for video frame extraction)
+
+### Setup
+
 ```bash
 git clone <repository-url>
 cd BadOffsetIdentifier
-pip3 install -r requirements.txt
-
-# Install ffmpeg (required for frame extraction)
-# macOS: brew install ffmpeg
-# Ubuntu/Debian: sudo apt-get install ffmpeg
-# Windows: Download from https://ffmpeg.org/download.html
+pip install -r requirements.txt
 ```
 
-### Configuration
-Set environment variables for your BSL data sources:
+### Install FFmpeg
+
+**macOS:**
 ```bash
-export BSL_EAF_FOLDER="/path/to/your/eaf/files"
-export BSL_VIDEO_FOLDER="/path/to/your/video/files"
+brew install ffmpeg
 ```
 
-Or place your data in:
+**Ubuntu/Debian:**
 ```bash
-BadOffsetIdentifier/CAVA_Data/EAFs/
-BadOffsetIdentifier/CAVA_Data/Videos/
+sudo apt-get install ffmpeg
 ```
 
-### Test Setup (Optional)
+**Windows:**
+Download from https://ffmpeg.org/download.html
+
+## Configuration
+
+### Option 1: Environment Variables
 ```bash
-python3 test_cava.py  # Check dependencies and data structure
+export BSL_EAF_FOLDER="/path/to/eaf/files"
+export BSL_VIDEO_FOLDER="/path/to/video/files"
 ```
 
-### Run
+### Option 2: Data Directory Structure
+```
+BadOffsetIdentifier/
+├── CAVA_Data/
+│   ├── EAFs/          # Place .eaf files here
+│   └── Videos/        # Place video files here
+└── [other files]
+```
+
+## Usage
+
+### Basic Usage
 ```bash
-python3 run_bot.py
+python run_bot.py
 ```
 
-## 🧪 Testing with CAVA Sample Files
+### Testing Setup
+```bash
+python test_cava.py
+```
 
-To test with publicly available BSL Corpus files:
+## How It Works
 
-1. **Visit CAVA Repository**: https://bslcorpusproject.org/cava/
-2. **Download Sample Files**: Look for narrative task files (open access)
-3. **Set up data structure**:
-   ```bash
-   mkdir -p CAVA_Data/EAFs CAVA_Data/Videos
-   # Move downloaded .eaf files to CAVA_Data/EAFs/
-   # Move downloaded .mp4 files to CAVA_Data/Videos/
-   ```
-4. **Run test**: `python3 test_cava.py`
-5. **Start analysis**: `python3 run_bot.py`
+1. **File Discovery**: Scans for EAF files with minimum 20 total annotations and at least 5 "GOOD" signs
+2. **Video Processing**: Extracts frames from corresponding video files at annotation midpoints (47.5%)
+3. **Offset Handling**: Applies TIME_ORIGIN offsets from EAF media descriptors
+4. **Visual Interface**: Displays frames side-by-side in a web browser
+5. **Decision Tracking**: Records accept/reject decisions in CSV format
+6. **Resume Capability**: Skips previously processed files
 
-**That's it!** The system will:
-1. ✅ Generate HTML assessment interface
-2. 📊 Create CSV tracking file
-3. 🌐 Open browser automatically
-4. 🔄 Ready to reload for each new file
-
-## 📁 **Clean Project Structure**
+## File Structure
 
 ```
 BadOffsetIdentifier/
-├── run_bot.py                   # 🎯 MAIN SCRIPT - Run this!
-├── simple_viewer.py             # Core assessment logic
-├── collect_decisions.py         # Merge downloaded decisions
-├── save_decision.py             # Manual CSV save script (backup)
-├── test_cava.py                 # Test setup and dependencies
+├── run_bot.py                   # Main execution script
+├── simple_viewer.py             # Core processing logic
+├── collect_decisions.py         # Decision file aggregation
+├── save_decision.py             # Manual decision recording
+├── decision_server.py           # HTTP server for decision handling
+├── test_cava.py                 # Setup validation
 ├── requirements.txt             # Python dependencies
-├── offset_assessment.html       # Generated HTML (reloadable)
-├── decisions.csv               # Your decision tracking
+├── decisions.csv               # Output decision tracking
 └── README.md                   # This file
 ```
 
-## 🎭 **What This Tool Does (Simple Explanation)**
+## Output
 
-1. **Finds Files**: Looks for complete annotation files (≥20 total annotations + ≥5 "GOOD" signs)
-2. **Smart Detection**: Only looks at the person's dominant hand (left or right)
-3. **Takes Pictures**: Captures 4 key moments of each "GOOD" sign
-4. **Shows You**: Displays one main picture (45%) + 3 smaller ones (25%)
-5. **Remembers**: Saves your Accept/Reject decisions in CSV file
-6. **Never Repeats**: Skips files you've already checked
+The tool generates:
+- **HTML interface**: Browser-based assessment interface
+- **CSV file**: Decision tracking with filename, decision, timestamp, and notes
+- **Console output**: Processing progress and file information
 
-## 🖼️ **Gallery Layout Features**
-
-### **45%/25% Layout (Default)**
-- **Main Frame (45%)**: Shows the peak gesture moment (most important)
-- **Secondary Frames (25% each)**: Shows start, hold, and end moments
-- **Less cluttered**: Focus on main gesture with supporting context
-
-### **Grid View (Toggle)**
-- **Equal-sized frames**: Traditional grid layout
-- **All frames visible**: See everything at once
-- **Switch easily**: Toggle between views
-
-## 📊 **CSV Tracking System**
-
-### **File Location**
-```
-BadOffsetIdentifier/decisions.csv
-```
-
-### **Format**
+### CSV Format
 ```csv
 filename,decision,timestamp,notes
-BF01F28WDC.eaf,accept,2024-09-26T11:30:15,Good alignment
-BF02M25WDC.eaf,reject,2024-09-26T11:35:22,Poor timing
+BF01F28WDC.eaf,accept,2024-10-03T14:23:15,Good alignment
+LN23C.eaf,reject,2024-10-03T14:28:42,Poor timing
 ```
 
-### **How It Works**
-1. 🏃‍♂️ **First run**: Creates empty CSV
-2. 👆 **Every decision**: Adds new line immediately
-3. 🔄 **Next run**: Reads CSV and skips processed files
-4. 💾 **Always saved**: Never lose your progress
+## Technical Requirements
 
-## ⌨️ **Usage Instructions**
+### Input Files
+- **EAF files**: ELAN annotation files with RH-IDgloss or LH-IDgloss tiers
+- **Video files**: Corresponding video files (.mov, .mp4, .avi)
+- **Minimum requirements**: 20 total annotations, 5 "GOOD" signs
 
-### **Basic Workflow**
-1. Run: `python3 run_bot.py`
-2. Browser opens with first unprocessed file
-3. Review frames showing "GOOD" signs
-4. Click **Accept ✅** or **Reject ❌**
-5. Decision downloads automatically to Downloads folder
-6. Page refreshes automatically for next file
-7. Run `python3 collect_decisions.py` to merge all decisions
+### Performance
+- Target processing speed: 50 files per hour
+- Frame extraction: <2 seconds per annotation
+- Decision recording: <1ms per entry
 
-### **Keyboard Shortcuts**
-- `Alt + A`: Accept (faster than clicking)
-- `Alt + R`: Reject (faster than clicking)
+## Requirements Met
 
-### **If Page Won't Load**
-- Check: BSL data sources configured correctly?
-- Check: Run from project root directory?
-- Check: Python dependencies installed? (`pip3 install -r requirements.txt`)
+- Cross-platform compatibility (Windows, macOS, Linux)
+- Configurable file paths
+- Dual video processing (multiple camera angles)
+- Accurate offset handling from EAF media descriptors
+- Resume functionality for interrupted sessions
+- Batch processing capability
+- CSV decision tracking
 
-## 🔧 **Technical Details**
+## Troubleshooting
 
-### **Requirements Met**
-- ✅ **Minimum 20 total annotations**: Files with <20 annotations discarded as incomplete
-- ✅ **Only "GOOD" signs**: Exact string matching (`== "GOOD"`)
-- ✅ **Dominant hand only**: Auto-detects from filename (`_LH` = left hand)
-- ✅ **Gallery viewpoint**: 45% main + 25% secondary layout
-- ✅ **CSV tracking**: Filename + decision columns
-- ✅ **Resume functionality**: Never check same file twice
-- ✅ **Reloadable**: Single HTML file you can refresh
+### Common Issues
 
-### **Performance Targets**
-- 🎯 **50 files/hour**: 72 seconds per file
-- ⚡ **Frame extraction**: <2 seconds per annotation
-- 🖼️ **Display**: Instant gallery layout
-- 💾 **CSV write**: <1ms per decision
+**No files found:**
+- Verify EAF files contain RH-IDgloss or LH-IDgloss tiers
+- Check minimum annotation requirements (20 total, 5 "GOOD")
+- Ensure video files are in correct location
 
-## 🛠️ **For Your Supervisor**
+**FFmpeg errors:**
+- Verify FFmpeg installation: `ffmpeg -version`
+- Check video file format compatibility
+- Ensure sufficient disk space for temporary files
 
-### **Q: "How does the standalone system work?"**
-**A:** Single Python script generates one HTML file with all frames embedded as base64. No external dependencies - just reload the page for next file.
+**Permission errors:**
+- Check read/write permissions for data directories
+- Verify network access if using remote file paths
 
-### **Q: "How reliable is the CSV tracking?"**
-**A:** Atomic writes prevent corruption. Each decision immediately saved. System reads CSV on startup to determine which files to skip.
+### File Format Support
+- **EAF files**: ELAN annotation files
+- **Video files**: .mov, .mp4, .avi formats
+- **Output**: HTML, CSV formats
 
-### **Q: "What if the system crashes?"**
-**A:** All decisions up to crash point are saved in CSV. Restart the script and it continues from where it left off.
+## License
 
-### **Q: "How do I verify it's working correctly?"**
-**A:**
-1. Check `decisions.csv` file exists and grows
-2. Reload page shows different file each time
-3. Console shows "Skipping X (already processed)" messages
-
-## 🎉 **Success Indicators**
-
-**You know it's working when:**
-- ✅ HTML file opens in browser showing real video frames
-- ✅ CSV file appears and grows with each decision
-- ✅ Reloading page shows next unprocessed file
-- ✅ Console shows processing progress and skip messages
-- ✅ Only exact "GOOD" signs appear (not "GOODBYE", etc.)
-- ✅ Gallery shows 1 large + 3 small frames per annotation
-
----
-
-**🎯 This is your complete Bad Offset Identifier Tool - ready for production use!**
+This tool is designed for academic research use with the British Sign Language Corpus.
