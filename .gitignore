@@ -81,5 +81,5 @@ CAVA_Data/
 *.tmp
 *.temp
 
-# Claude Code
+# Development environment
 .claude/
