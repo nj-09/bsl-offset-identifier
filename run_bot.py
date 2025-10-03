@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Bad Offset Identifier Tool Main Runner
-Single command to run the complete assessment system
+Bad Offset Identifier Tool - Main Entry Point
+Automated assessment system for BSL video offset detection
 """
 
 import subprocess
