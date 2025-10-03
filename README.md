@@ -16,8 +16,8 @@ The tool extracts frames from video files at the midpoint of "GOOD" sign annotat
 ### Setup
 
 ```bash
-git clone <repository-url>
-cd BadOffsetIdentifier
+git clone https://github.com/nj-09/bsl-offset-identifier.git
+cd bsl-offset-identifier
 pip install -r requirements.txt
 ```
 
@@ -46,7 +46,7 @@ export BSL_VIDEO_FOLDER="/path/to/video/files"
 
 ### Option 2: Data Directory Structure
 ```
-BadOffsetIdentifier/
+bsl-offset-identifier/
 ├── CAVA_Data/
 │   ├── EAFs/          # Place .eaf files here
 │   └── Videos/        # Place video files here
@@ -77,15 +77,18 @@ python test_cava.py
 ## File Structure
 
 ```
-BadOffsetIdentifier/
+bsl-offset-identifier/
 ├── run_bot.py                   # Main execution script
-├── simple_viewer.py             # Core processing logic
-├── collect_decisions.py         # Decision file aggregation
-├── save_decision.py             # Manual decision recording
-├── decision_server.py           # HTTP server for decision handling
 ├── test_cava.py                 # Setup validation
 ├── requirements.txt             # Python dependencies
-├── decisions.csv               # Output decision tracking
+├── src/                         # Core source code
+│   ├── simple_viewer.py         # Core processing logic
+│   ├── decision_server.py       # HTTP server for decision handling
+│   ├── collect_decisions.py     # Decision file aggregation
+│   └── save_decision.py         # Manual decision recording
+├── docs/                        # Documentation
+├── debug_tools/                 # Debug utilities
+├── decisions.csv               # Output decision tracking (generated)
 └── README.md                   # This file
 ```
 
