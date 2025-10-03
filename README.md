@@ -106,7 +106,14 @@ BF01F28WDC.eaf,accept,2024-10-03T14:23:15,Good alignment
 LN23C.eaf,reject,2024-10-03T14:28:42,Poor timing
 ```
 
-## Technical Requirements
+## Data Source Requirements
+
+### BSL Corpus Data Structure
+This tool requires EAF files with **ID gloss annotations** (RH-IDgloss, LH-IDgloss tiers containing signs like "GOOD", "HELLO", etc.).
+
+**Important Note**: Public CAVA narrative files contain only English translations, not ID gloss annotations. For full functionality, this tool requires:
+- **Conversation files** with detailed ID gloss annotations (UCL internal access)
+- **Annotated EAF files** with RH-IDgloss/LH-IDgloss tiers
 
 ### Input Files
 - **EAF files**: ELAN annotation files with RH-IDgloss or LH-IDgloss tiers
@@ -133,7 +140,8 @@ LN23C.eaf,reject,2024-10-03T14:28:42,Poor timing
 ### Common Issues
 
 **No files found:**
-- Verify EAF files contain RH-IDgloss or LH-IDgloss tiers
+- Verify EAF files contain RH-IDgloss or LH-IDgloss tiers (not just English translations)
+- Public CAVA narrative files only have translation tiers - conversation files with ID gloss annotations are required
 - Check minimum annotation requirements (20 total, 5 "GOOD")
 - Ensure video files are in correct location
 
