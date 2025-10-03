@@ -55,8 +55,10 @@ def check_data_structure():
         print(f"  ⚠️  EAF folder not found")
 
     if os.path.exists(video_folder):
-        video_files = list(Path(video_folder).rglob("*.mp4"))
-        print(f"  ✅ Found {len(video_files)} MP4 files")
+        mp4_files = list(Path(video_folder).rglob("*.mp4"))
+        mov_files = list(Path(video_folder).rglob("*.mov"))
+        total_videos = len(mp4_files) + len(mov_files)
+        print(f"  ✅ Found {total_videos} video files ({len(mp4_files)} MP4, {len(mov_files)} MOV)")
     else:
         print(f"  ⚠️  Video folder not found")
 

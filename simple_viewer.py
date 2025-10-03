@@ -96,41 +96,63 @@ class SimpleSignAnnotate:
         except:
             return False
 
-    def find_video_files(self, eaf_filename):
-        """Find corresponding video files for BSL Corpus"""
-        base_name = os.path.splitext(eaf_filename)[0]
-        region_code = base_name[:2]
-
-        try:
-            number = base_name[2:4].lstrip('0') or '0'
-        except:
-            number = '1'
-
-        patterns = [
-            f"{region_code}/{region_code}{number}+2c.mp4",
-            f"{region_code}/{region_code}{number}c.mp4",
-        ]
+    def find_video_files(self, eaf_filename, eaf=None):
+        """Find corresponding video files from EAF media descriptors"""
+        if eaf is None:
+            try:
+                eaf_path = os.path.join(self.eaf_folder, eaf_filename) if not os.path.isabs(eaf_filename) else eaf_filename
+                eaf = pympi.Elan.Eaf(eaf_path)
+            except:
+                return []
 
         found_videos = []
-        for pattern in patterns:
-            video_path = os.path.join(self.video_folder, pattern)
-            if os.path.exists(video_path):
-                found_videos.append(video_path)
 
-        # If we only found one video, try to find a complementary video
-        if len(found_videos) == 1:
-            import glob
-            # Look for any other videos with similar number pattern
-            search_patterns = [
-                f"{region_code}/{region_code}*{number}*c.mp4",
-                f"{region_code}/{region_code}{number.zfill(2)}*.mp4"
-            ]
-            for search_pattern in search_patterns:
-                video_pattern = os.path.join(self.video_folder, search_pattern)
-                all_matching = glob.glob(video_pattern)
-                for video_path in all_matching:
-                    if video_path not in found_videos and len(found_videos) < 2:
+        # Get video files from EAF media descriptors
+        for descriptor in eaf.media_descriptors:
+            if "MEDIA_URL" in descriptor:
+                media_url = descriptor["MEDIA_URL"]
+
+                # Extract filename from URL (handle both local files and URLs)
+                if "file://" in media_url:
+                    video_filename = os.path.basename(media_url)
+                else:
+                    video_filename = os.path.basename(media_url)
+
+                # Look for this video file in our video folder
+                # Try various extensions (.mov, .mp4)
+                base_name = os.path.splitext(video_filename)[0]
+                extensions = ['.mov', '.mp4', '.avi']
+
+                for ext in extensions:
+                    video_path = os.path.join(self.video_folder, base_name + ext)
+                    if os.path.exists(video_path):
                         found_videos.append(video_path)
+                        print(f"   📹 Found video: {os.path.basename(video_path)}")
+                        break
+                else:
+                    # If exact match not found, try partial matching
+                    import glob
+                    search_pattern = os.path.join(self.video_folder, f"*{base_name.replace('-comp', '')}*")
+                    matches = glob.glob(search_pattern)
+                    for match in matches:
+                        if match not in found_videos:
+                            found_videos.append(match)
+                            print(f"   📹 Found video (partial match): {os.path.basename(match)}")
+                            break
+
+        # If still no videos found, try basic filename matching
+        if not found_videos:
+            base_name = os.path.splitext(eaf_filename)[0]
+            import glob
+            search_patterns = [
+                os.path.join(self.video_folder, f"{base_name}.*"),
+                os.path.join(self.video_folder, f"*{base_name}*"),
+            ]
+            for pattern in search_patterns:
+                matches = glob.glob(pattern)
+                for match in matches:
+                    if match.lower().endswith(('.mov', '.mp4', '.avi')):
+                        found_videos.append(match)
 
         return found_videos
 
@@ -169,7 +191,7 @@ class SimpleSignAnnotate:
                         'value': value
                     })
 
-            videos = self.find_video_files(filename)
+            videos = self.find_video_files(filename, eaf)
             all_frames = []
 
             # Extract frames from all annotations and videos
